@@ -1,58 +1,230 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Sistem Informasi Perpustakaan Sekolah (perpustakaan-skenda)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Aplikasi web untuk manajemen perpustakaan sekolah berbasis **Laravel 13**, **Filament v5**, **Livewire v4**, dan **SQLite** (dev). Sistem siap digunakan untuk operasional perpustakaan sekolah dengan fitur peminjaman, pengembalian, reservasi, denda, notifikasi, dan laporan.
 
-## About Laravel
+## Fitur Utama
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- **Manajemen Buku**: CRUD buku, kategori, dan eksemplar fisik (book_copies) dengan barcode unik per eksemplar
+- **Manajemen Anggota**: CRUD siswa/anggota dengan status aktif/nonaktif/diblokir
+- **Peminjaman**: Workflow lengkap (ajuan → persetujuan petugas → peminjaman fisik) dengan anti-race condition pada stok
+- **Pengembalian**: Proses pengembalian dengan perhitungan denda otomatis, idempotent terhadap double-submit
+- **Perpanjangan**: Pengajuan perpanjangan dengan validasi antrean reservasi dan batas maksimal
+- **Reservasi**: Antrean reservasi buku yang tidak tersedia, promosi otomatis saat buku dikembalikan
+- **Denda**: Perhitungan denda otomatis berdasarkan keterlambatan, status lunas/belum dibayar/dicabut
+- **Notifikasi**: Reminder H-3/H-1/H0 dan notifikasi keterlambatan melalui scheduler
+- **Laporan**: Laporan peminjaman, pengembalian, keterlambatan, buku, anggota, dan denda dengan export CSV
+- **Pengaturan**: Konfigurasi sistem (durasi pinjam, denda per hari, batas pinjaman, dll.) dengan caching
+- **Audit Log**: Catatan semua tindakan penting untuk pelacakan aktivitas
+- **Role & Authorization**: Super Admin, Petugas, Siswa dengan policy-based authorization
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Struktur Role
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+| Role | Email | Password | Keterangan |
+|------|-------|----------|------------|
+| Super Admin | superadmin@skenda.test | password | Akses penuh + pengaturan |
+| Petugas | staff@skenda.test | password | Operasional harian |
+| Siswa | siswa1@skenda.test | password | NIS 2526001 |
+| Siswa | siswa2@skenda.test | password | NIS 2526002 |
+| Siswa | siswa3@skenda.test | password | NIS 2526003 |
 
-## Learning Laravel
+## Persyaratan Sistem
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+- PHP `^8.3`
+- Composer
+- Node.js & npm (untuk asset build)
+- SQLite (development) / MySQL / PostgreSQL (production)
 
-In addition, [Laracasts](https://laracasts.com) contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-You can also watch bite-sized lessons with real-world projects on [Laravel Learn](https://laravel.com/learn), where you will be guided through building a Laravel application from scratch while learning PHP fundamentals.
-
-## Agentic Development
-
-Laravel's predictable structure and conventions make it ideal for AI coding agents like Claude Code, Cursor, and GitHub Copilot. Install [Laravel Boost](https://laravel.com/docs/ai) to supercharge your AI workflow:
+## Instalasi
 
 ```bash
-composer require laravel/boost --dev
+# Clone repository
+git clone <repository-url>
+cd perpustakaan-skenda
 
-php artisan boost:install
+# Install dependencies PHP
+composer install
+
+# Install dependencies JS
+npm install
+
+# Salin file environment
+cp .env.example .env
+php artisan key:generate
+
+# Konfigurasi database di .env (default SQLite)
+# DB_CONNECTION=sqlite
+# DB_DATABASE=/absolute/path/to/database/database.sqlite
+
+# Buat file database SQLite (jika belum ada)
+touch database/database.sqlite
+
+# Jalankan migrasi dan seeder
+php artisan migrate:fresh --seed
+
+# Build asset frontend
+npm run build
+
+# Jalankan development server
+php artisan serve
 ```
 
-Boost provides your agent 15+ tools and skills that help agents build Laravel applications while following best practices.
+## Database Setup
 
-## Contributing
+Migrasi mencakup semua tabel inti:
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- `users` — akun login dengan role (student/staff/super_admin)
+- `students` — data siswa/anggota (terkait user)
+- `categories` — kategori buku
+- `books` — metadata buku (judul, penulis, ISBN, stok, dll.)
+- `book_copies` — eksemplar fisik dengan barcode unik
+- `loans` — transaksi peminjaman
+- `loan_items` — detail item dalam peminjaman
+- `loan_extensions` — riwayat perpanjangan
+- `reservations` — antrean reservasi buku
+- `fines` — denda keterlambatan
+- `settings` — konfigurasi sistem
+- `audit_logs` — catatan aktivitas
+- `notifications` — notifikasi sistem
 
-## Code of Conduct
+## Seeder
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```bash
+php artisan migrate:fresh --seed
+```
 
-## Security Vulnerabilities
+Seeder membuat data development: super admin, petugas, 3 siswa, kategori, buku dengan eksemplar, dan data transaksi contoh.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Queue
 
-## License
+Notifikasi diantrekan (ShouldQueue). Untuk menjalankan worker:
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+```bash
+php artisan queue:work
+```
+
+## Scheduler
+
+Scheduler menjalankan tugas berkala:
+
+- `loans:mark-overdue` (setiap jam) — tandai peminjaman terlambat
+- `reservations:expire` (setiap jam) — kedaluwarsakan reservasi dan oper antrean
+- `loans:send-reminders` (setiap hari pukul 07:00) — kirim reminder H-3/H-1/H0
+
+Tambahkan ke crontab server:
+
+```bash
+* * * * * cd /path-to-project && php artisan schedule:run >> /dev/null 2>&1
+```
+
+Untuk development, jalankan manual:
+
+```bash
+php artisan schedule:run
+```
+
+## Storage Link
+
+```bash
+php artisan storage:link
+```
+
+Untuk mengakses file yang diunggah (cover buku, logo pengaturan, dll.) dari `public/storage`.
+
+## Credential Development
+
+Semua akun development menggunakan password `password`. Jangan gunakan kredensial ini di production.
+
+## Role Pengguna
+
+### Super Admin
+- Akses penuh ke semua fitur
+- Mengelola akun pengguna, role, dan pengaturan sistem
+- Mengakses semua laporan dan audit log
+
+### Petugas
+- Mengelola data buku, kategori, anggota
+- Menyetujui/menolak peminjaman
+- Memproses pengembalian dan perpanjangan
+- Mengelola denda dan reservasi
+
+### Siswa
+- Melihat katalog buku dan ketersediaan
+- Mengajukan peminjaman dan reservasi
+- Melihat riwayat peminjaman dan denda
+- Mengakses dashboard pribadi
+
+## Alur Peminjaman
+
+1. Siswa login dan mencari buku di katalog
+2. Siswa mengajukan peminjaman (status: PENDING)
+3. Petugas menyetujui atau menolak pengajuan
+4. Jika disetujui, petugas menandai buku sebagai dipinjam (status: BORROWED, stok berkurang)
+5. Sistem menentukan tanggal jatuh tempo berdasarkan pengaturan
+
+## Alur Pengembalian
+
+1. Petugas membuka menu pengembalian dan scan barcode
+2. Sistem menampilkan detail peminjaman dan denda (jika terlambat)
+3. Petugas mengonfirmasi pengembalian (stok kembali, status diperbarui)
+4. Sistem menghitung denda otomatis jika terlambat
+
+## Alur Reservasi
+
+1. Siswa membuat reservasi untuk buku yang tidak tersedia
+2. Reservasi masuk antrean berdasarkan queue_position
+3. Ketika buku dikembalikan, sistem mempromosikan reservasi terdepan menjadi AVAILABLE
+4. Siswa diberi notifikasi dan mempunyai waktu tertentu untuk mengambil buku
+5. Jika tidak mengambil hingga batas waktu, reservasi expired dan antrean berikutnya dipromosikan
+
+## Command Penting
+
+| Command | Keterangan |
+|---------|------------|
+| `php artisan migrate:fresh --seed` | Reset database + seed development |
+| `php artisan test` | Jalankan seluruh test suite |
+| `php artisan schedule:run` | Jalankan scheduler tugas berkala |
+| `php artisan queue:work` | Jalankan worker queue |
+| `php artisan storage:link` | Buat symlink storage publik |
+| `npm run build` | Build asset frontend (produksi) |
+| `npm run dev` | Watch asset frontend (development) |
+
+## Testing
+
+Test suite mencakup 14 kasus bisnis kritis per §46 perpus.md:
+
+1. Siswa dapat membuat pengajuan peminjaman
+2. Siswa tidak dapat meminjam stok kosong
+3. Siswa tidak dapat melebihi limit pinjaman
+4. Petugas dapat approve peminjaman
+5. Stok berkurang hanya pada tahap BORROWED
+6. Pengembalian meningkatkan stok
+7. Double return tidak meningkatkan stok dua kali
+8. Denda dihitung dengan benar
+9. Reservasi masuk antrean
+10. Buku yang kembali diberikan ke reservasi pertama
+11. Reservasi expired dipindahkan ke antrean berikutnya
+12. Siswa tidak dapat melihat transaksi siswa lain
+13. Petugas tidak dapat mengakses fitur Super Admin tanpa permission
+14. Race condition stok tidak menyebabkan over-borrowing
+
+Jalankan test:
+
+```bash
+php artisan test
+```
+
+## Arsitektur
+
+- **Service Layer**: Bisnis logic terpusat di service class (`LoanService`, `ReturnService`, `FineService`, `ReservationService`, `NotificationService`, `SettingsService`, `BookStockService`, `BarcodeService`)
+- **Events & Listeners**: Domain events untuk audit dan notifikasi terpisah dari transaksi inti
+- **Policies**: Authorization berbasis policy untuk setiap model
+- **Enum**: PHP BackedEnum dengan `label()` dalam Bahasa Indonesia
+- **Soft Deletes**: `books`, `book_copies`, `students` menggunakan soft delete; `loans`/`loan_items` tidak dihapus
+
+## Dokumentasi Lengkap
+
+Lihat file `perpus.md` (53 bab) sebagai sumber kebenaran bisnis dan spesifikasi implementasi.
+
+## Lisensi
+
+Internal — Sistem Informasi Perpustakaan Sekolah.

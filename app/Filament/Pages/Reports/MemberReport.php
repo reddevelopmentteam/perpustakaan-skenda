@@ -156,8 +156,9 @@ class MemberReport extends Page implements HasTable
                     ->color('success')
                     ->action(fn (): StreamedResponse => $this->exportCsv()),
             ])
+            ->emptyStateIcon('heroicon-m-users')
             ->emptyStateHeading('Belum ada anggota')
-            ->emptyStateDescription('Data siswa yang tercatat akan tampil di sini.');
+            ->emptyStateDescription('Daftarkan anggota baru melalui menu Master Data > Anggota.');
     }
 
     public function exportCsv(): StreamedResponse

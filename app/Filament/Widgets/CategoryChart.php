@@ -49,6 +49,17 @@ class CategoryChart extends ChartWidget
                 [
                     'label' => 'Jumlah Buku',
                     'data' => $data,
+                    'backgroundColor' => [
+                        '#1B5E40',
+                        '#287A52',
+                        '#3D996B',
+                        '#6BB58C',
+                        '#9ED4B3',
+                        '#477FA5',
+                        '#DCEFE3',
+                    ],
+                    'borderColor' => '#FFFFFF',
+                    'borderWidth' => 2,
                 ],
             ],
             'labels' => $labels,

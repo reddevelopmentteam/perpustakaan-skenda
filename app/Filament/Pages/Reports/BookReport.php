@@ -136,8 +136,9 @@ class BookReport extends Page implements HasTable
                     ->color('success')
                     ->action(fn (): StreamedResponse => $this->exportCsv()),
             ])
-            ->emptyStateHeading('Belum ada buku')
-            ->emptyStateDescription('Data buku yang tercatat akan tampil di sini.');
+            ->emptyStateIcon('heroicon-m-book-open')
+            ->emptyStateHeading('Belum ada buku terdaftar')
+            ->emptyStateDescription('Tambah buku pertama melalui menu Master Data > Buku.');
     }
 
     public function exportCsv(): StreamedResponse

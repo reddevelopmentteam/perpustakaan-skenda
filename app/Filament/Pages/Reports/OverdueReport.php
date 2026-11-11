@@ -145,8 +145,9 @@ class OverdueReport extends Page implements HasTable
                     ->color('success')
                     ->action(fn (): StreamedResponse => $this->exportCsv()),
             ])
+            ->emptyStateIcon('heroicon-m-exclamation-circle')
             ->emptyStateHeading('Tidak ada keterlambatan')
-            ->emptyStateDescription('Pinjaman yang melewati jatuh tempo akan tampil di sini.');
+            ->emptyStateDescription('Semua pinjaman saat ini masih tepat waktu.');
     }
 
     public static function lateDays(Loan $loan): int

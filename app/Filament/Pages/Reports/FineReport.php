@@ -153,8 +153,9 @@ class FineReport extends Page implements HasTable
                     ->color('success')
                     ->action(fn (): StreamedResponse => $this->exportCsv()),
             ])
-            ->emptyStateHeading('Belum ada denda')
-            ->emptyStateDescription('Data denda yang tercatat akan tampil di sini.');
+            ->emptyStateIcon('heroicon-m-currency-dollar')
+            ->emptyStateHeading('Belum ada data denda')
+            ->emptyStateDescription('Denda akan muncul saat ada pinjaman yang terlambat.');
     }
 
     public function exportCsv(): StreamedResponse

@@ -199,8 +199,9 @@ class LoanReport extends Page implements HasTable
                     ->color('success')
                     ->action(fn (): StreamedResponse => $this->exportCsv()),
             ])
+            ->emptyStateIcon('heroicon-m-document')
             ->emptyStateHeading('Belum ada data peminjaman')
-            ->emptyStateDescription('Data pinjaman yang tercatat akan tampil di sini.');
+            ->emptyStateDescription('Mulai pencatatan peminjaman baru melalui menu Peminjaman.');
     }
 
     public function exportCsv(): StreamedResponse

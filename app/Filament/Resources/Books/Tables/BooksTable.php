@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\Books\Tables;
 
+use App\Models\Book;
+use App\Models\Category;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
@@ -17,6 +19,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Filters\TrashedFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
 
 class BooksTable
 {
@@ -27,34 +30,49 @@ class BooksTable
                 ImageColumn::make('cover')
                     ->label('Cover')
                     ->disk('public')
-                    ->circular(),
+                    ->imageSize(100)
+                    ->defaultImageUrl(null)
+                    ->extraImgAttributes(['class' => 'object-contain'])
+                    ->grow(false),
                 TextColumn::make('title')
                     ->label('Judul')
                     ->searchable()
                     ->sortable()
-                    ->description(fn ($record): ?string => $record->description)
-                    ->wrap(),
+                    ->weight('medium'),
                 TextColumn::make('author')
                     ->label('Penulis')
                     ->searchable()
-                    ->sortable(),
+                    ->sortable()
+                    ->toggleable(),
+                TextColumn::make('isbn')
+                    ->label('ISBN')
+                    ->searchable()
+                    ->copyable()
+                    ->toggleable()
+                    ->placeholder('-'),
                 TextColumn::make('category.name')
                     ->label('Kategori')
                     ->badge()
-                    ->placeholder('-'),
+                    ->color('gray')
+                    ->placeholder('Tanpa kategori')
+                    ->sortable(),
                 TextColumn::make('publication_year')
                     ->label('Tahun')
                     ->sortable()
-                    ->toggleable(),
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('stock')
                     ->label('Stok')
-                    ->sortable(),
+                    ->numeric()
+                    ->sortable()
+                    ->alignCenter()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 TextColumn::make('available_stock')
-                    ->label('Tersedia')
+                    ->label('Ketersediaan')
                     ->sortable()
                     ->badge()
                     ->color(fn (int $state): string => $state > 0 ? 'success' : 'danger')
-                    ->formatStateUsing(fn (int $state): string => $state > 0 ? (string) $state : 'Habis'),
+                    ->formatStateUsing(fn (int $state): string => $state > 0 ? $state.' tersedia' : 'Habis')
+                    ->alignCenter(),
                 TextColumn::make('created_at')
                     ->label('Dibuat')
                     ->dateTime('d M Y')
@@ -94,6 +112,8 @@ class BooksTable
                     ForceDeleteBulkAction::make()
                         ->requiresConfirmation(),
                 ]),
-            ]);
+            ])
+            ->striped()
+            ->defaultPaginationPageOption(10);
     }
 }

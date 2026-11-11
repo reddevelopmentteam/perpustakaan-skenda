@@ -153,8 +153,9 @@ class ReturnReport extends Page implements HasTable
                     ->color('success')
                     ->action(fn (): StreamedResponse => $this->exportCsv()),
             ])
+            ->emptyStateIcon('heroicon-m-check-circle')
             ->emptyStateHeading('Belum ada data pengembalian')
-            ->emptyStateDescription('Pinjaman yang sudah dikembalikan akan tampil di sini.');
+            ->emptyStateDescription('Data pengembalian akan muncul di sini setelah buku dikembalikan.');
     }
 
     public static function isOnTime(Loan $loan): bool
