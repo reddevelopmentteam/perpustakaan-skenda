@@ -143,7 +143,7 @@ class ReturnBooks extends Page
                         $rows = [];
 
                         foreach ($this->activeItems as $item) {
-                                $rows[] = Text::make(($item['book_title'] ?? '-') . ' — ' . ($item['inventory_code'] ?? '-'));
+                            $rows[] = Text::make(($item['book_title'] ?? '-') . ' — ' . ($item['inventory_code'] ?? '-'));
                         }
 
                         return $rows !== [] ? $rows : [Text::make('Tidak ada item aktif.')];
@@ -245,7 +245,7 @@ class ReturnBooks extends Page
             ->map(fn ($item): array => [
                 'id' => $item->id,
                 'book_title' => $item->book?->title ?? 'Buku #' . $item->book_id,
-                'barcode' => $item->copy?->inventory_code ?? '-',
+                'inventory_code' => $item->copy?->inventory_code ?? '-',
                 'due_at' => $item->due_at?->format('d M Y') ?? $loan->due_at?->format('d M Y') ?? '-',
                 'status' => $item->status->label(),
             ])

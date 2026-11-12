@@ -107,14 +107,6 @@ class BookCopyResource extends Resource
                             $set('inventory_code', $code);
                         })
                 ),
-            TextInput::make('barcode')
-                ->label('Barcode')
-                ->nullable()
-                ->maxLength(255)
-                ->unique(ignoreRecord: true)
-                ->validationMessages([
-                    'unique' => 'Barcode sudah digunakan.',
-                ]),
             Select::make('status')
                 ->label('Status')
                 ->options(self::statusOptions())
@@ -215,9 +207,6 @@ class BookCopyResource extends Resource
                             ->size(TextSize::Large)
                             ->weight(FontWeight::Bold)
                             ->fontFamily(FontFamily::Mono),
-                        TextEntry::make('barcode')
-                            ->label('Barcode')
-                            ->copyable(),
                         TextEntry::make('status')
                             ->label('Status')
                             ->badge()

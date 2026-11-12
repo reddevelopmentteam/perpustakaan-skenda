@@ -38,14 +38,6 @@ class CopiesRelationManager extends RelationManager
                         'unique' => 'Nomor induk sudah digunakan.',
                         'regex' => 'Format nomor induk harus BK- diikuti 6 digit (contoh BK-000001).',
                     ]),
-                TextInput::make('barcode')
-                    ->label('Barcode')
-                    ->nullable()
-                    ->maxLength(255)
-                    ->unique(ignoreRecord: true)
-                    ->validationMessages([
-                        'unique' => 'Barcode sudah digunakan.',
-                    ]),
                 Select::make('status')
                     ->label('Status')
                     ->options(collect(BookCopyStatus::cases())->mapWithKeys(fn (BookCopyStatus $status): array => [
@@ -81,10 +73,6 @@ class CopiesRelationManager extends RelationManager
                     ->label('Nomor Induk')
                     ->searchable()
                     ->copyable(),
-                TextColumn::make('barcode')
-                    ->label('Barcode')
-                    ->toggleable()
-                    ->placeholder('-'),
                 TextColumn::make('status')
                     ->label('Status')
                     ->badge()

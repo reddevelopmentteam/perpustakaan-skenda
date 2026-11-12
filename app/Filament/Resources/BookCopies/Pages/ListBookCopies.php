@@ -21,7 +21,7 @@ class ListBookCopies extends ListRecords
                 ->icon('heroicon-o-printer')
                 ->action(function (): void {
                     Notification::make()
-                        ->title('Fitur cetak barcode menyusul di Tahap 6 lanjutan')
+                        ->title('Fitur cetak nomor induk menyusul di Tahap 6 lanjutan')
                         ->info()
                         ->send();
                 }),

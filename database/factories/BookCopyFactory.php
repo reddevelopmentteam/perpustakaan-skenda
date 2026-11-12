@@ -21,8 +21,7 @@ class BookCopyFactory extends Factory
     {
         return [
             'book_id' => Book::factory(),
-            'barcode' => $this->faker->unique()->numerify('BK-######'),
-            'inventory_code' => $this->faker->unique()->numerify('INV-######'),
+            'inventory_code' => $this->faker->unique()->numerify('BK-######'),
             'status' => BookCopyStatus::AVAILABLE,
             'condition' => $this->faker->randomElement(['Baik', 'Baik', 'Baik', 'Sampul kusam']),
         ];
