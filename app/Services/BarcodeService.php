@@ -6,7 +6,7 @@ use App\Models\BookCopy;
 use Illuminate\Support\Str;
 
 /**
- * Generate barcode unik per eksemplar fisik (§6).
+ * Generate nomor induk unik per eksemplar fisik (§6).
  *
  * Format: BK-000001 (prefix + 6 digit angka berurutan).
  * Nomor digenerate dengan retry untuk menghindari duplikasi race condition.
@@ -16,7 +16,7 @@ class BarcodeService
     public const PREFIX = 'BK';
 
     /**
-     * Generate barcode unik untuk eksemplar baru.
+     * Generate nomor induk unik untuk eksemplar baru.
      *
      * @param  int  $digits  Jumlah digit angka (default 6 -> BK-000001)
      * @param  int  $maxAttempts  Maksimal percobaan jika bentrok
@@ -28,18 +28,18 @@ class BarcodeService
 
         for ($attempt = 1; $attempt <= $maxAttempts; $attempt++) {
             $number = mt_rand(1, (int) str_repeat('9', $digits));
-            $barcode = self::PREFIX . '-' . str_pad((string) $number, $digits, '0', STR_PAD_LEFT);
+            $code = self::PREFIX . '-' . str_pad((string) $number, $digits, '0', STR_PAD_LEFT);
 
-            if (! BookCopy::query()->where('barcode', $barcode)->exists()) {
-                return $barcode;
+            if (! BookCopy::query()->where('inventory_code', $code)->exists()) {
+                return $code;
             }
         }
 
         // Fallback: cari angka terbesar yang ada lalu +1
         $last = BookCopy::query()
-            ->where('barcode', 'like', self::PREFIX . '-%')
-            ->orderByDesc('barcode')
-            ->value('barcode');
+            ->where('inventory_code', 'like', self::PREFIX . '-%')
+            ->orderByDesc('inventory_code')
+            ->value('inventory_code');
 
         if ($last !== null) {
             $num = (int) Str::after($last, self::PREFIX . '-') + 1;
@@ -51,10 +51,10 @@ class BarcodeService
     }
 
     /**
-     * Validasi format barcode.
+     * Validasi format nomor induk.
      */
-    public static function isValid(string $barcode): bool
+    public static function isValid(string $code): bool
     {
-        return (bool) preg_match('/^' . self::PREFIX . '-\d{6}$/', $barcode);
+        return (bool) preg_match('/^' . self::PREFIX . '-\d{6}$/', $code);
     }
 }

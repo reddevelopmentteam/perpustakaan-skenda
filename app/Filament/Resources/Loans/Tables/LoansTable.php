@@ -222,7 +222,7 @@ class LoansTable
             ->color('info')
             ->requiresConfirmation()
             ->modalHeading('Serahkan buku (tandai dipinjam)')
-            ->modalDescription('Pilih eksemplar fisik (barcode) untuk setiap buku. Stok keluar saat aksi ini dijalankan.')
+            ->modalDescription('Pilih eksemplar fisik (nomor induk) untuk setiap buku. Stok keluar saat aksi ini dijalankan.')
             ->schema(fn (Loan $record): array => [
                 Repeater::make('copies')
                     ->label('Eksemplar')
@@ -245,7 +245,7 @@ class LoansTable
                                 'required' => 'Item wajib dipilih.',
                             ]),
                         Select::make('book_copy_id')
-                            ->label('Eksemplar (barcode)')
+                            ->label('Eksemplar (nomor induk)')
                             ->options(function (Get $get): array {
                                 $itemId = $get('loan_item_id');
 
@@ -262,11 +262,11 @@ class LoansTable
                                 return BookCopy::query()
                                     ->where('book_id', $item->book_id)
                                     ->where('status', \App\Enums\BookCopyStatus::AVAILABLE)
-                                    ->orderBy('barcode')
+                                    ->orderBy('inventory_code')
                                     ->limit(100)
                                     ->get()
                                     ->mapWithKeys(fn (BookCopy $copy): array => [
-                                        $copy->id => $copy->barcode,
+                                        $copy->id => $copy->inventory_code,
                                     ])
                                     ->all();
                             })

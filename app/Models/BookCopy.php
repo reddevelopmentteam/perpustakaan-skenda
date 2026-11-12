@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['book_id', 'barcode', 'inventory_code', 'status', 'condition', 'shelf_location', 'notes'])]
+#[Fillable(['book_id', 'inventory_code', 'barcode', 'status', 'condition', 'shelf_location', 'notes'])]
 class BookCopy extends Model
 {
     use HasFactory, SoftDeletes;

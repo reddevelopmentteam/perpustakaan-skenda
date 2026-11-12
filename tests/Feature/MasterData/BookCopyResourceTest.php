@@ -51,7 +51,7 @@ class BookCopyResourceTest extends TestCase
     {
         BookCopy::create([
             'book_id' => $this->book->id,
-            'barcode' => 'BK-000001',
+            'inventory_code' => 'BK-000001',
             'status' => BookCopyStatus::AVAILABLE,
         ]);
 
@@ -59,7 +59,7 @@ class BookCopyResourceTest extends TestCase
 
         BookCopy::create([
             'book_id' => $this->book->id,
-            'barcode' => 'BK-000001',
+            'inventory_code' => 'BK-000001',
             'status' => BookCopyStatus::AVAILABLE,
         ]);
     }
@@ -68,12 +68,12 @@ class BookCopyResourceTest extends TestCase
     {
         $borrowed = BookCopy::create([
             'book_id' => $this->book->id,
-            'barcode' => 'BK-000002',
+            'inventory_code' => 'BK-000002',
             'status' => BookCopyStatus::BORROWED,
         ]);
         $available = BookCopy::create([
             'book_id' => $this->book->id,
-            'barcode' => 'BK-000003',
+            'inventory_code' => 'BK-000003',
             'status' => BookCopyStatus::AVAILABLE,
         ]);
 

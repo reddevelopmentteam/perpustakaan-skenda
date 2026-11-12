@@ -28,23 +28,23 @@ class CopiesRelationManager extends RelationManager
     {
         return $schema
             ->components([
-                TextInput::make('barcode')
-                    ->label('Barcode')
+                TextInput::make('inventory_code')
+                    ->label('Nomor Induk')
                     ->nullable()
                     ->unique(ignoreRecord: true)
                     ->regex('/^BK-\d{6}$/')
                     ->helperText('Format BK-000001; kosongkan untuk generate otomatis.')
                     ->validationMessages([
-                        'unique' => 'Barcode sudah digunakan.',
-                        'regex' => 'Format barcode harus BK- diikuti 6 digit (contoh BK-000001).',
+                        'unique' => 'Nomor induk sudah digunakan.',
+                        'regex' => 'Format nomor induk harus BK- diikuti 6 digit (contoh BK-000001).',
                     ]),
-                TextInput::make('inventory_code')
-                    ->label('Kode Inventaris')
+                TextInput::make('barcode')
+                    ->label('Barcode')
                     ->nullable()
                     ->maxLength(255)
                     ->unique(ignoreRecord: true)
                     ->validationMessages([
-                        'unique' => 'Kode inventaris sudah digunakan.',
+                        'unique' => 'Barcode sudah digunakan.',
                     ]),
                 Select::make('status')
                     ->label('Status')
@@ -75,14 +75,14 @@ class CopiesRelationManager extends RelationManager
     public function table(Table $table): Table
     {
         return $table
-            ->recordTitleAttribute('barcode')
+            ->recordTitleAttribute('inventory_code')
             ->columns([
-                TextColumn::make('barcode')
-                    ->label('Barcode')
+                TextColumn::make('inventory_code')
+                    ->label('Nomor Induk')
                     ->searchable()
                     ->copyable(),
-                TextColumn::make('inventory_code')
-                    ->label('Kode Inventaris')
+                TextColumn::make('barcode')
+                    ->label('Barcode')
                     ->toggleable()
                     ->placeholder('-'),
                 TextColumn::make('status')
@@ -107,8 +107,8 @@ class CopiesRelationManager extends RelationManager
                 CreateAction::make()
                     ->label('Tambah Eksemplar')
                     ->mutateFormDataUsing(function (array $data): array {
-                        if (blank($data['barcode'] ?? null)) {
-                            $data['barcode'] = self::generateBarcode();
+                        if (blank($data['inventory_code'] ?? null)) {
+                            $data['inventory_code'] = self::generateInventoryCode();
                         }
 
                         return $data;
@@ -128,17 +128,17 @@ class CopiesRelationManager extends RelationManager
             ]);
     }
 
-    public static function generateBarcode(): string
+    public static function generateInventoryCode(): string
     {
         for ($attempt = 0; $attempt < 10; $attempt++) {
-            $barcode = 'BK-'.str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+            $code = 'BK-'.str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
-            if (! BookCopy::query()->where('barcode', $barcode)->exists()) {
-                return $barcode;
+            if (! BookCopy::query()->where('inventory_code', $code)->exists()) {
+                return $code;
             }
         }
 
-        $last = BookCopy::query()->orderByDesc('id')->value('barcode');
+        $last = BookCopy::query()->orderByDesc('id')->value('inventory_code');
 
         $next = 1;
 

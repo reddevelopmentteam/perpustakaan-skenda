@@ -11,8 +11,8 @@ return new class extends Migration
         Schema::create('book_copies', function (Blueprint $table) {
             $table->id();
             $table->foreignId('book_id')->constrained('books')->restrictOnDelete();
-            $table->string('barcode')->unique();
-            $table->string('inventory_code')->nullable()->unique();
+            $table->string('barcode')->nullable()->unique();
+            $table->string('inventory_code')->unique();
             $table->string('status')->default('available')->index();
             $table->string('condition')->nullable();
             $table->string('shelf_location')->nullable();

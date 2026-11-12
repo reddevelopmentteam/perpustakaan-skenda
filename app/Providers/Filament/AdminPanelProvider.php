@@ -11,6 +11,7 @@ use Filament\Pages\Dashboard;
 use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\Support\Colors\Color;
+use Filament\Support\Enums\Width;
 use Filament\View\PanelsRenderHook;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
@@ -31,6 +32,7 @@ class AdminPanelProvider extends PanelProvider
             ->login(CustomLogin::class)
             ->brandName('Perpustakaan SMKN 2 Banjarmasin')
             ->brandLogo(asset('images/logo_smkn_2.png'))
+            ->favicon(asset('favicon.ico'))
             ->font('Plus Jakarta Sans')
             ->viteTheme('resources/css/filament/admin/theme.css')
             ->colors([
@@ -54,6 +56,7 @@ class AdminPanelProvider extends PanelProvider
                 'gray' => Color::Slate,
             ])
             ->sidebarCollapsibleOnDesktop()
+            ->maxContentWidth(Width::Full)
             ->globalSearch()
             ->renderHook(
                 PanelsRenderHook::SIDEBAR_NAV_START,

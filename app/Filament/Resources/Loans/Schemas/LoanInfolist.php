@@ -100,8 +100,8 @@ class LoanInfolist
                                 TextEntry::make('book.title')
                                     ->label('Buku')
                                     ->placeholder('-'),
-                                TextEntry::make('copy.barcode')
-                                    ->label('Barcode')
+                                TextEntry::make('copy.inventory_code')
+                                    ->label('Nomor Induk')
                                     ->placeholder('-')
                                     ->copyable(),
                                 TextEntry::make('status')

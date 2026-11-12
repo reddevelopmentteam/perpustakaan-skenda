@@ -246,11 +246,11 @@ class LoanService
                 }
 
                 if ($copy->book_id !== $item->book_id) {
-                    throw new LoanException("Eksemplar {$copy->barcode} bukan milik buku \"{$book->title}\".");
+                    throw new LoanException("Eksemplar {$copy->inventory_code} bukan milik buku \"{$book->title}\".");
                 }
 
                 if (! $copy->status->isBorrowable()) {
-                    throw new LoanException("Eksemplar {$copy->barcode} tidak tersedia.");
+                    throw new LoanException("Eksemplar {$copy->inventory_code} tidak tersedia.");
                 }
 
                 if ($book->available_stock <= 0) {
@@ -323,12 +323,12 @@ class LoanService
     }
 
     /**
-     * Cari buku lewat barcode eksemplar (alur scan §11 langkah 3-5).
+     * Cari buku lewat nomor induk eksemplar (alur scan §11 langkah 3-5).
      * Mengembalikan Book beserta eksemplar yang masih tersedia.
      */
-    public static function findByBarcode(string $barcode): ?Book
+    public static function findByInventoryCode(string $inventoryCode): ?Book
     {
-        $copy = BookCopy::query()->where('barcode', $barcode)->first();
+        $copy = BookCopy::query()->where('inventory_code', $inventoryCode)->first();
 
         if ($copy === null) {
             return null;

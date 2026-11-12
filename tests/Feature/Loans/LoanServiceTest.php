@@ -368,11 +368,11 @@ class LoanServiceTest extends TestCase
         $book = $this->buatBukuDenganEksemplar(2);
         $copy = $book->copies()->firstOrFail();
 
-        $ditemukan = LoanService::findByBarcode($copy->barcode);
+        $ditemukan = LoanService::findByInventoryCode($copy->inventory_code);
 
-        $this->assertNotNull($ditemukan, 'Barcode terdaftar harus menemukan buku.');
-        $this->assertSame($book->id, $ditemukan->id, 'Barcode harus memetakan ke buku pemilik eksemplar.');
-        $this->assertNull(LoanService::findByBarcode('BK-TIDAK-ADA'), 'Barcode tak dikenal harus mengembalikan null.');
+        $this->assertNotNull($ditemukan, 'Nomor induk terdaftar harus menemukan buku.');
+        $this->assertSame($book->id, $ditemukan->id, 'Nomor induk harus memetakan ke buku pemilik eksemplar.');
+        $this->assertNull(LoanService::findByInventoryCode('BK-TIDAK-ADA'), 'Nomor induk tak dikenal harus mengembalikan null.');
     }
 
     public function test_audit_dan_notifikasi_tertulis_untuk_request_dan_approve(): void

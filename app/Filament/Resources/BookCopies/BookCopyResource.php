@@ -48,7 +48,7 @@ class BookCopyResource extends Resource
 
     protected static ?string $pluralModelLabel = 'Eksemplar Buku';
 
-    protected static ?string $recordTitleAttribute = 'barcode';
+    protected static ?string $recordTitleAttribute = 'inventory_code';
 
     protected static ?string $navigationLabel = 'Eksemplar Buku';
 
@@ -84,16 +84,16 @@ class BookCopyResource extends Resource
                 ->validationMessages([
                     'required' => 'Buku wajib dipilih.',
                 ]),
-            TextInput::make('barcode')
-                ->label('Barcode')
+            TextInput::make('inventory_code')
+                ->label('Nomor Induk')
                 ->required()
                 ->maxLength(255)
                 ->regex('/^BK-\d{6}$/')
                 ->unique(ignoreRecord: true)
                 ->validationMessages([
-                    'required' => 'Barcode wajib diisi.',
-                    'regex' => 'Format barcode harus BK- diikuti 6 digit (contoh BK-000001).',
-                    'unique' => 'Barcode sudah digunakan.',
+                    'required' => 'Nomor induk wajib diisi.',
+                    'regex' => 'Format nomor induk harus BK- diikuti 6 digit (contoh BK-000001).',
+                    'unique' => 'Nomor induk sudah digunakan.',
                 ])
                 ->suffixAction(
                     Action::make('generate')
@@ -101,18 +101,19 @@ class BookCopyResource extends Resource
                         ->icon('heroicon-o-arrow-path')
                         ->action(function (Set $set): void {
                             do {
-                                $barcode = 'BK-'.str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-                            } while (BookCopy::where('barcode', $barcode)->exists());
+                                $code = 'BK-'.str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+                            } while (BookCopy::where('inventory_code', $code)->exists());
 
-                            $set('barcode', $barcode);
+                            $set('inventory_code', $code);
                         })
                 ),
-            TextInput::make('inventory_code')
-                ->label('Kode Inventaris')
+            TextInput::make('barcode')
+                ->label('Barcode')
+                ->nullable()
                 ->maxLength(255)
                 ->unique(ignoreRecord: true)
                 ->validationMessages([
-                    'unique' => 'Kode inventaris sudah digunakan.',
+                    'unique' => 'Barcode sudah digunakan.',
                 ]),
             Select::make('status')
                 ->label('Status')
@@ -147,8 +148,8 @@ class BookCopyResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('barcode')
-                    ->label('Barcode')
+                TextColumn::make('inventory_code')
+                    ->label('Nomor Induk')
                     ->searchable()
                     ->sortable()
                     ->copyable()
@@ -208,14 +209,14 @@ class BookCopyResource extends Resource
             Section::make('Eksemplar')
                 ->schema([
                     Grid::make(2)->schema([
-                        TextEntry::make('barcode')
-                            ->label('Barcode')
+                        TextEntry::make('inventory_code')
+                            ->label('Nomor Induk')
                             ->copyable()
                             ->size(TextSize::Large)
                             ->weight(FontWeight::Bold)
                             ->fontFamily(FontFamily::Mono),
-                        TextEntry::make('inventory_code')
-                            ->label('Kode Inventaris')
+                        TextEntry::make('barcode')
+                            ->label('Barcode')
                             ->copyable(),
                         TextEntry::make('status')
                             ->label('Status')

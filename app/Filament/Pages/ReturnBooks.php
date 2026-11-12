@@ -79,14 +79,14 @@ class ReturnBooks extends Page
         return $schema
             ->statePath('data')
             ->components([
-                TextInput::make('barcode')
-                    ->label('Scan / Ketik Barcode')
+                TextInput::make('inventory_code')
+                    ->label('Scan / Ketik Nomor Induk')
                     ->placeholder('cth. BK-000001')
                     ->helperText('Tempelkan kursor di sini lalu scan — tekan Cari atau Enter untuk mencari eksemplar.')
                     ->autofocus()
                     ->required()
                     ->validationMessages([
-                        'required' => 'Barcode wajib diisi.',
+                        'required' => 'Nomor induk wajib diisi.',
                     ]),
             ]);
     }
@@ -143,7 +143,7 @@ class ReturnBooks extends Page
                         $rows = [];
 
                         foreach ($this->activeItems as $item) {
-                            $rows[] = Text::make(($item['book_title'] ?? '-') . ' — ' . ($item['barcode'] ?? '-'));
+                                $rows[] = Text::make(($item['book_title'] ?? '-') . ' — ' . ($item['inventory_code'] ?? '-'));
                         }
 
                         return $rows !== [] ? $rows : [Text::make('Tidak ada item aktif.')];
@@ -167,31 +167,31 @@ class ReturnBooks extends Page
     public function search(): void
     {
         $state = $this->form->getState();
-        $barcode = trim((string) ($state['barcode'] ?? ''));
+        $inventoryCode = trim((string) ($state['inventory_code'] ?? ''));
 
         $this->reset(['loanId', 'preview', 'activeItems']);
 
-        if ($barcode === '') {
+        if ($inventoryCode === '') {
             Notification::make()
                 ->danger()
-                ->title('Barcode wajib diisi.')
+                ->title('Nomor induk wajib diisi.')
                 ->send();
 
             return;
         }
 
-        $copy = BookCopy::query()->where('barcode', $barcode)->first();
+        $copy = BookCopy::query()->where('inventory_code', $inventoryCode)->first();
 
         if (! $copy) {
             $this->preview = [
                 'status' => 'error',
-                'message' => "Barcode {$barcode} tidak dikenal. Periksa kembali barcode eksemplar.",
+                'message' => "Nomor induk {$inventoryCode} tidak dikenal. Periksa kembali nomor induk eksemplar.",
             ];
 
             Notification::make()
                 ->danger()
-                ->title('Barcode tidak dikenal.')
-                ->body("Tidak ada eksemplar dengan barcode {$barcode}.")
+                ->title('Nomor induk tidak dikenal.')
+                ->body("Tidak ada eksemplar dengan nomor induk {$inventoryCode}.")
                 ->send();
 
             return;
@@ -217,13 +217,13 @@ class ReturnBooks extends Page
 
             $this->preview = [
                 'status' => 'warning',
-                'message' => "Eksemplar {$barcode} tidak sedang dipinjam." . $info,
+                'message' => "Eksemplar {$inventoryCode} tidak sedang dipinjam." . $info,
             ];
 
             Notification::make()
                 ->warning()
                 ->title('Eksemplar tidak sedang dipinjam.')
-                ->body("Eksemplar {$barcode} tidak tercatat dipinjam pada transaksi aktif." . $info)
+                ->body("Eksemplar {$inventoryCode} tidak tercatat dipinjam pada transaksi aktif." . $info)
                 ->send();
 
             return;
@@ -245,7 +245,7 @@ class ReturnBooks extends Page
             ->map(fn ($item): array => [
                 'id' => $item->id,
                 'book_title' => $item->book?->title ?? 'Buku #' . $item->book_id,
-                'barcode' => $item->copy?->barcode ?? '-',
+                'barcode' => $item->copy?->inventory_code ?? '-',
                 'due_at' => $item->due_at?->format('d M Y') ?? $loan->due_at?->format('d M Y') ?? '-',
                 'status' => $item->status->label(),
             ])
@@ -271,7 +271,7 @@ class ReturnBooks extends Page
             Notification::make()
                 ->danger()
                 ->title('Tidak ada pinjaman yang dipilih.')
-                ->body('Cari barcode terlebih dahulu sebelum memproses pengembalian.')
+                ->body('Cari nomor induk terlebih dahulu sebelum memproses pengembalian.')
                 ->send();
 
             return;
@@ -335,7 +335,7 @@ class ReturnBooks extends Page
     {
         return match ($this->preview['status'] ?? '') {
             'found' => 'Pinjaman ' . ($this->preview['loan_number'] ?? ''),
-            'error' => 'Barcode tidak dikenal',
+            'error' => 'Nomor induk tidak dikenal',
             'warning' => 'Tidak sedang dipinjam',
             default => '',
         };
